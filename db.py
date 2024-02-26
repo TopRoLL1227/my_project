@@ -9,12 +9,43 @@ def connect_to_db():
 
     try:
         conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
-        print("Підключення до бази даних успішне!")
+        print("Connection to database successful!")
         return conn
     except psycopg2.Error as e:
-        print("Помилка при підключенні до бази даних:", e)
+        print("Error connecting to database:", e)
         return None
 
+def add_object_to_database(username, password):
+    conn = connect_to_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return True
+        except psycopg2.Error as e:
+            print("Error adding object to database:", e)
+            conn.rollback()
+            cursor.close()
+            conn.close()
+            return False
 
-if __name__ == "__main__":
-    connect_to_db()
+def check_user(username, password):
+    conn = connect_to_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+            user = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if user:
+                return True
+            else:
+                return False
+        except psycopg2.Error as e:
+            print("Error checking user:", e)
+            conn.close()
+            return False
