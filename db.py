@@ -49,3 +49,37 @@ def check_user(username, password):
             print("Error checking user:", e)
             conn.close()
             return False
+
+def get_user_by_username(username):
+    conn = connect_to_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            return user
+        except psycopg2.Error as e:
+            print("Error while fetching user by username:", e)
+            conn.close()
+            return None
+    else:
+        return None
+
+def get_user_by_id(user_id):
+    conn = connect_to_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            return user
+        except psycopg2.Error as e:
+            print("Error while fetching user by id:", e)
+            conn.close()
+            return None
+    else:
+        return None
